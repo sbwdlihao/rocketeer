@@ -31,19 +31,25 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
      * Deploy a new clean copy of the application.
      *
      * @param string|null $destination
+     * @param string|null $source
      *
      * @return bool
      */
-    public function deploy($destination = null)
+    public function deploy($destination = null, $source = null)
     {
         if (!$destination) {
             $destination = $this->releasesManager->getCurrentReleasePath();
         }
 
+        if (!$source) {
+            $source = $this->getOption('sync_source');
+        }
+
+
         // Create receiveing folder
         $this->createFolder($destination);
 
-        return $this->rsyncTo($destination);
+        return $this->rsyncTo($destination, $source);
     }
 
     /**
@@ -64,6 +70,7 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
      * Rsyncs the local folder to a remote one.
      *
      * @param string $destination
+     * @param string $source
      *
      * @return bool
      */
@@ -84,7 +91,7 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
         $arguments[] = $handle.':'.$destination;
 
         // Set excluded files and folders
-        $options['--exclude'] = ['.git', 'vendor'];
+        $options['--exclude'] = $this->getOption('sync_exclude');
 
         // Create binary and command
         $rsync   = $this->binary('rsync');

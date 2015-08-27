@@ -126,6 +126,10 @@ class TasksBuilder
             return new $concrete($this->app);
         }
 
+        if (!$this->app->bound('rocketeer.strategies.'.$handle)) {
+            return false;
+        }
+
         return $this->app['rocketeer.strategies.'.$handle];
     }
 

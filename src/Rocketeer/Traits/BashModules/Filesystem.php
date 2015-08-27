@@ -149,6 +149,17 @@ trait Filesystem
     }
 
     /**
+     * Check if a file is writable.
+     *
+     * @param string $file Path to the file
+     *
+     * @return bool
+     */
+    public function fileWritable($file) {
+        return $this->checkStatement(sprintf('-w "%s"', $file));
+    }
+
+    /**
      * Execute permissions actions on a file with the provided callback.
      *
      * @param string $folder
