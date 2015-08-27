@@ -77,19 +77,24 @@ class PhpStrategy extends AbstractCheckStrategy implements CheckStrategyInterfac
      */
     public function extensions()
     {
-        $extensions = [
-            'mcrypt'   => ['checkPhpExtension', 'mcrypt'],
-            'database' => ['checkDatabaseDriver', $this->app['config']->get('database.default')],
-            'cache'    => ['checkCacheDriver', $this->app['config']->get('cache.driver')],
-            'session'  => ['checkCacheDriver', $this->app['config']->get('session.driver')],
-        ];
+        $extensions = $this->app['rocketeer.rocketeer']->getOption('php.extensions');
+        if (empty($extensions)) {
+            return [];
+        }
 
         // Check PHP extensions
         $errors = [];
-        foreach ($extensions as $check) {
-            list($method, $extension) = $check;
-
-            if (!$this->$method($extension)) {
+        foreach ($extensions as $method=>$extension) {
+            if (empty($extension)) {
+                continue;
+            }
+            if (!method_exists($this, $method)) {
+                $errors = array_merge($errors, $extension);
+            }
+            $r = $this->$method($extension);
+            if (is_array($r)) {
+                $errors = array_merge($errors, $r);
+            } else if ($r === FALSE) {
                 $errors[] = $extension;
             }
         }
@@ -163,6 +168,10 @@ class PhpStrategy extends AbstractCheckStrategy implements CheckStrategyInterfac
      */
     public function checkPhpExtension($extension)
     {
+        $error = [];
+        if (is_string($extension)) {
+            $extension = (array)$extension;
+        }
         // Check for HHVM and built-in extensions
         if ($this->php()->isHhvm()) {
             $this->extensions = [
@@ -212,6 +221,24 @@ class PhpStrategy extends AbstractCheckStrategy implements CheckStrategyInterfac
             $this->extensions = (array) $this->bash->run($this->php()->extensions(), false, true);
         }
 
-        return in_array($extension, $this->extensions, true);
+        foreach ($extension as $val) {
+            if (!in_array($val, $this->extensions, true)) {
+                $error[] = $val;
+            }
+        }
+        return $error;
+    }
+
+    public function checkService($serviceName) {
+        $error = [];
+        if (is_string($serviceName)) {
+            $serviceName = (array)$serviceName;
+        }
+        foreach($serviceName as $val) {
+            if (!empty($val) && !$this->rawWhich($val)) {
+                $error[] = $val;
+            }
+        }
+        return $error;
     }
 }

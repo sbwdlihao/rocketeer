@@ -42,7 +42,7 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
         }
 
         if (!$source) {
-            $source = $this->getOption('sync_source');
+            $source = $this->app['rocketeer.rocketeer']->getOption('sync_source');
         }
 
 
@@ -91,7 +91,7 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
         $arguments[] = $handle.':'.$destination;
 
         // Set excluded files and folders
-        $options['--exclude'] = $this->getOption('sync_exclude');
+        $options['--exclude'] = $this->app['rocketeer.rocketeer']->getOption('sync_exclude');
 
         // Create binary and command
         $rsync   = $this->binary('rsync');
