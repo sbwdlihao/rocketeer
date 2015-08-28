@@ -45,7 +45,6 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
             $source = $this->app['rocketeer.rocketeer']->getOption('sync_source');
         }
 
-
         // Create receiveing folder
         $this->createFolder($destination);
 
@@ -71,10 +70,11 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
      *
      * @param string $destination
      * @param string $source
+     * @param bool $isUpdate
      *
      * @return bool
      */
-    protected function rsyncTo($destination, $source = './')
+    protected function rsyncTo($destination, $source = './', $isUpdate = false)
     {
         // Build host handle
         $arguments = [];
@@ -82,6 +82,9 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
 
         // Create options
         $options = ['--verbose' => null, '--recursive' => null, '--rsh' => 'ssh', '--compress' => null];
+        if ($isUpdate) {
+            $options['--update'] = null;
+        }
 
         // Create SSH command
         $options['--rsh'] = $this->getTransport();

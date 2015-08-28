@@ -49,6 +49,7 @@ class Deploy extends AbstractTask
 
         // Create release and set it up
         $this->steps()->executeTask('CreateRelease');
+        $this->steps()->fireEvent('after-createRelease');
         $this->steps()->executeTask('Dependencies');
 
         if ($this->getOption('tests')) {
