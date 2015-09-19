@@ -10,11 +10,6 @@
  */
 namespace Rocketeer\Strategies\Deploy;
 
-use Illuminate\Support\Arr;
-use Rocketeer\Abstracts\Strategies\AbstractStrategy;
-use Rocketeer\Bash;
-use Rocketeer\Interfaces\Strategies\DeployStrategyInterface;
-
 class RemoteCopySyncStrategy extends SyncStrategy
 {
     /**
@@ -46,13 +41,13 @@ class RemoteCopySyncStrategy extends SyncStrategy
         }
 
         // Create receiveing folder
-        $this->createFolder($destination);
+        $this->createFolder($destination, true);
 
         // Copy current folder
         $previous = $this->releasesManager->getPathToRelease($this->releasesManager->getPreviousRelease());
         $previous = rtrim($previous, '/').'/**';
         $this->copy($previous, $destination);
 
-        return $this->rsyncTo($destination, $source, true);
+        return $this->rsyncTo($destination, $source, $this->exclude, true);
     }
 }
