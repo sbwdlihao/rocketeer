@@ -10,6 +10,7 @@
  */
 namespace Rocketeer\Strategies\Deploy;
 
+use Illuminate\Container\Container;
 use Rocketeer\Abstracts\Strategies\AbstractStrategy;
 use Rocketeer\Interfaces\Strategies\DeployStrategyInterface;
 use Rocketeer\Traits\Rsync;
@@ -34,7 +35,7 @@ class SyncStrategy extends AbstractStrategy implements DeployStrategyInterface
     protected $exclude;
 
     public function __construct(Container $app) {
-        super($app);
+        parent::__construct($app);
 
         $this->exclude = $this->app['rocketeer.rocketeer']->getOption('sync_exclude');
     }
