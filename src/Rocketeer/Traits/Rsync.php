@@ -34,7 +34,7 @@ trait Rsync
         $handle    = $this->getSyncHandle();
 
         // Create options
-        $options = ['--verbose' => null, '--recursive' => null, '--rsh' => 'ssh', '--compress' => null];
+        $options = ['--verbose' => null, '--recursive' => null, '--rsh' => 'ssh', '--compress' => null, '--delete'=>null];
         if ($isUpdate) {
             $options['--update'] = null;
         }
