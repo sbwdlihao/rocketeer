@@ -23,14 +23,14 @@ trait Encrypt
         });
     }
 
-    public function encryptUpload($sourcePath, $destinationPath) {
+    public function encryptUpload($sourcePath, $destinationPath, $exclude = null) {
         if (is_dir($sourcePath)) {
             $tmpEncryptPath = $this->paths->getUserHomeFolder().'/'.uniqid(rand()).'/';
         } else {
             $tmpEncryptPath = $this->paths->getUserHomeFolder().'/'.uniqid(rand()).'.php';
         }
         $this->encryptCode($sourcePath, $tmpEncryptPath);
-        $this->rsyncTo($destinationPath, $tmpEncryptPath, ['/logs/', '/sessions/']);
+        $this->rsyncTo($destinationPath, $tmpEncryptPath, $exclude);
         $this->bash->onLocal(function(Bash $bash) use ($tmpEncryptPath){
             return $bash->run('rm -rf '.$tmpEncryptPath);
         });
