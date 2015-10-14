@@ -45,8 +45,10 @@ class RemoteCopySyncStrategy extends SyncStrategy
 
         // Copy current folder
         $previous = $this->releasesManager->getPathToRelease($this->releasesManager->getPreviousRelease());
-        $previous = rtrim($previous, '/').'/**';
-        $this->copy($previous, $destination);
+        if ($destination != $previous) {
+            $previous = rtrim($previous, '/').'/**';
+            $this->copy($previous, $destination);
+        }
 
         return $this->rsyncTo($destination, $source, $this->exclude, true);
     }

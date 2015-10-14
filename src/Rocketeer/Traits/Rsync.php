@@ -24,31 +24,36 @@ trait Rsync
      * @param string $source
      * @param array $exclude
      * @param bool $isUpdate
+     * @param bool $isRsh
      *
      * @return bool
      */
-    public function rsyncTo($destination, $source = './', $exclude = null, $isUpdate = false)
+    public function rsyncTo($destination, $source = './', $exclude = null, $isUpdate = false, $isRsh = true)
     {
         // Build host handle
-        $arguments = [];
-        $handle    = $this->getSyncHandle();
+        $arguments[] = $source;
 
         // Create options
-        $options = ['--verbose' => null, '--recursive' => null, '--rsh' => 'ssh', '--compress' => null, '--delete'=>null];
-        if ($isUpdate) {
-            $options['--update'] = null;
-        }
-
-        // Create SSH command
-        $options['--rsh'] = $this->getTransport();
-
-        // Build arguments
-        $arguments[] = $source;
-        $arguments[] = $handle.':'.$destination;
+        $options = ['-avz' => null, '--delete'=>null];
 
         // Set excluded files and folders
         if (!empty($exclude)) {
             $options['--exclude'] = $exclude;
+        }
+
+        if ($isUpdate) {
+            $options['--update'] = null;
+        }
+
+        if ($isRsh) {
+            $handle    = $this->getSyncHandle();
+            // Create SSH command
+            $options['--rsh'] = $this->getTransport();
+            // Build arguments
+            $arguments[] = $handle.':'.$destination;
+        } else {
+            $options['--password-file'] = $this->app['rocketeer.rocketeer']->getOption('rsync_daemon_password_file');
+            $arguments[] = $destination;
         }
 
         // Create binary and command
